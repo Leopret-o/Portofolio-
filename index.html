@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     INDEX.HTML — a estrutura da página (o "esqueleto").
+     Os elementos vazios (ex.: <h1 id="frase"></h1>) são preenchidos
+     pelo script.js com os dados guardados no Supabase.
+     ============================================================ -->
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <!-- Faz a página usar a largura real do telemóvel (senão fica "encolhida") -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portfólio</title>
+  <meta name="description" content="Portfólio de estudante: projectos, competências e formação.">
+
+  <!-- Tipos de letra do Google: "Inter Tight" para títulos e "Inter" para texto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+
+  <!-- O visual do site (cores, tamanhos, posições) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ CABEÇALHO ============ -->
+  <header class="topo">
+    <div class="container cabecalho-interno">
+      <a href="#inicio" class="marca" id="marca">Portfólio</a>
+
+      <nav class="links" aria-label="Secções da página">
+        <a href="#projectos">Projectos</a>
+        <a href="#competencias">Competências</a>
+        <a href="#formacao">Formação</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="acoes">
+        <!-- Este botão só aparece quando tens sessão iniciada (o script decide) -->
+        <button type="button" class="btn btn-preto btn-pequeno" id="btn-editar" hidden>Editar</button>
+        <a href="#contacto" class="btn btn-preto btn-pequeno">Falar comigo</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="inicio">
+
+    <!-- ============ HERO (a primeira coisa que se vê) ============ -->
+    <section class="hero container">
+
+      <p class="estado">
+        <span class="bolinha" aria-hidden="true"></span>
+        <span id="disponibilidade"></span>
+      </p>
+
+      <h1 class="frase" id="frase"></h1>
+
+      <figure class="hero-foto">
+        <!-- A foto tem fundo branco: no CSS, "mix-blend-mode" faz esse branco desaparecer -->
+        <img id="foto" width="941" height="784" alt="Foto de perfil">
+      </figure>
+
+      <div class="hero-rodape">
+        <div>
+          <p class="titulo-hero" id="titulo"></p>
+          <div class="botoes">
+            <a class="btn btn-preto" id="botao-email" href="#contacto">Enviar email</a>
+            <a class="btn btn-contorno" href="#projectos">Ver projectos</a>
+          </div>
+        </div>
+        <p class="bio" id="bio"></p>
+      </div>
+
+    </section>
+
+    <!-- ============ PROJECTOS ============ -->
+    <section id="projectos" class="container seccao">
+      <h2>Projectos em destaque</h2>
+      <!-- O script cria aqui um cartão por projecto -->
+      <div class="grelha-projetos" id="lista-projetos"></div>
+    </section>
+
+    <!-- ============ COMPETÊNCIAS ============ -->
+    <section id="competencias" class="container seccao">
+      <h2>Competências</h2>
+      <!-- O script cria aqui uma linha com barra por competência -->
+      <ul class="lista-skills" id="lista-skills"></ul>
+    </section>
+
+    <!-- ============ FORMAÇÃO ============ -->
+    <section id="formacao" class="container seccao">
+      <h2>Formação</h2>
+      <div class="lista-formacao" id="lista-formacoes"></div>
+    </section>
+
+    <!-- ============ CONTACTO ============ -->
+    <section id="contacto" class="container seccao contacto">
+      <h2>Vamos trabalhar juntos?</h2>
+      <p class="intro suave">Estou disponível para estágios, projectos académicos e colaborações.</p>
+
+      <a class="email-grande" id="email-grande" href="#contacto"></a>
+
+      <div class="redes">
+        <!-- Cada rede só aparece se tiver link (o script esconde as que estão vazias) -->
+        <a id="rede-github" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a id="rede-linkedin" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+        <a id="rede-instagram" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+        <a id="rede-facebook" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
+      </div>
+
+      <p class="suave contacto-detalhes" id="contacto-detalhes"></p>
+    </section>
+
+  </main>
+
+  <!-- ============ RODAPÉ ============ -->
+  <footer class="rodape container">
+    <p class="suave" id="rodape-texto"></p>
+    <!-- Sem sessão: abre o login. Com sessão: abre o editor (o script decide) -->
+    <button type="button" class="link-discreto" id="btn-autor">Área do autor</button>
+  </footer>
+
+  <!-- ============ JANELA DE LOGIN (email + palavra-passe) ============ -->
+  <div class="janela" id="janela-login" role="dialog" aria-modal="true" aria-labelledby="titulo-login" hidden>
+    <div class="fundo" data-fechar></div>
+    <!-- Usamos <form> para o teclado do iPhone mostrar o botão "Entrar" -->
+    <form class="caixa" id="form-login">
+      <h2 id="titulo-login">Entrar</h2>
+      <p class="suave">Inicia sessão para editar o site. Podes fazê-lo em qualquer dispositivo.</p>
+
+      <label class="campo-rotulo" for="campo-email">Email</label>
+      <input id="campo-email" type="email" autocomplete="username" inputmode="email" required>
+
+      <label class="campo-rotulo" for="campo-palavra">Palavra-passe</label>
+      <input id="campo-palavra" type="password" autocomplete="current-password" required>
+
+      <p class="erro" id="erro-login" hidden></p>
+
+      <div class="botoes-direita">
+        <button type="button" class="btn btn-contorno btn-pequeno" data-fechar>Cancelar</button>
+        <button type="submit" class="btn btn-preto btn-pequeno" id="btn-entrar">Entrar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ============ GAVETA DO EDITOR (só tu a vês) ============ -->
+  <div class="janela" id="janela-editor" role="dialog" aria-modal="true" aria-label="Editar o site" hidden>
+    <div class="fundo" data-fechar></div>
+    <aside class="gaveta">
+      <div class="gaveta-topo">
+        <h2>Editar o site</h2>
+        <button type="button" class="btn-fechar" data-fechar aria-label="Fechar">×</button>
+      </div>
+      <div class="gaveta-corpo">
+        <!-- Aqui aparece "A guardar…" ou "Guardado ✓" -->
+        <p class="estado-guardar" id="estado-guardar" aria-live="polite"></p>
+        <!-- O script constrói aqui os campos do formulário -->
+        <div id="editor"></div>
+        <div class="gaveta-rodape">
+          <button type="button" class="link-discreto" id="btn-repor">Repor exemplo</button>
+          <button type="button" class="link-discreto" id="btn-sair">Terminar sessão</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Mensagem curta no fundo do ecrã (ex.: um erro de configuração) -->
+  <div class="aviso" id="aviso" role="status" hidden></div>
+
+  <!-- ============ SCRIPTS (a ORDEM importa!) ============ -->
+  <!-- 1.º: a biblioteca do Supabase. Cria a variável global "supabase" com a função createClient -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2.º: a tua configuração (URL, chave e email). É o único ficheiro que preenches -->
+  <script src="config.js"></script>
+  <!-- 3.º: a lógica do site. "defer" = só corre depois de o HTML estar lido -->
+  <script src="script.js" defer></script>
+</body>
+</html>

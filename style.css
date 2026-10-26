@@ -1,0 +1,628 @@
+/* =====================================================
+   STYLE.CSS — o visual do portfólio
+   Inspiração: fundo branco, texto preto, títulos grandes,
+   retrato recortado e cartões com cantos redondos.
+
+   ÍNDICE
+   1. Variáveis (cores e tamanhos base)
+   2. Base (regras gerais)
+   3. Botões
+   4. Cabeçalho
+   5. Hero (a primeira secção)
+   6. Secções em geral
+   7. Projectos
+   8. Competências
+   9. Formação
+   10. Contacto
+   11. Rodapé
+   12. Janelas (login e gaveta do editor)
+   13. Animações e acessibilidade
+   ===================================================== */
+
+
+/* 1. VARIÁVEIS ----------------------------------------
+   Mudar um valor aqui muda o site inteiro. */
+:root {
+  --fundo: #ffffff;          /* branco puro (o fundo da foto também é branco puro) */
+  --texto: #111111;          /* texto principal, quase preto */
+  --suave: #6b6b6b;          /* texto secundário, cinzento */
+  --linha: #e8e8e8;          /* linhas finas e separadores */
+  --cinza-claro: #f2f2f2;    /* fundo dos cartões sem imagem */
+  --verde: #22c55e;          /* a única cor do site: a bolinha de "disponível" */
+
+  --fonte-titulo: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --fonte-texto: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --raio-cartao: 1.5rem;     /* cantos dos cartões (24 px) */
+  --raio-pilula: 999px;      /* botões em forma de pílula */
+  --transicao: 300ms ease;   /* duração padrão das transições */
+}
+
+
+/* 2. BASE ---------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;    /* a largura inclui o espaço interior (padding) e a borda */
+  margin: 0;                 /* retira as margens que o browser põe por defeito */
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;   /* rolagem suave ao clicar nos links do menu */
+  scroll-padding-top: 5rem;  /* o título não fica escondido atrás do cabeçalho */
+}
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-texto);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button, input, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+
+/* Contorno visível quando se navega com o teclado (acessibilidade) */
+:focus-visible { outline: 2px solid var(--texto); outline-offset: 3px; }
+
+/* "hidden" tem de ganhar sempre, mesmo que outra regra diga display: flex */
+[hidden] { display: none !important; }
+
+/* Quando a gaveta está aberta, a página de trás não rola */
+.sem-scroll { overflow: hidden; }
+
+h1, h2 {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  letter-spacing: -0.035em;  /* títulos grandes ficam mais juntos (aspeto mais moderno) */
+  line-height: 1.05;
+}
+h2 { font-size: clamp(1.9rem, 4vw, 2.75rem); }
+
+.container {
+  max-width: 1200px;
+  margin-inline: auto;       /* centra o conteúdo */
+  padding-inline: 1.25rem;   /* margem de respiro dos lados */
+}
+
+.suave { color: var(--suave); }
+
+
+/* 3. BOTÕES -------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .85rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: var(--raio-pilula);
+  font-size: .95rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform var(--transicao), border-color var(--transicao);
+}
+.btn:hover { transform: translateY(-2px); }          /* sobe um pouco ao passar o rato */
+.btn-preto { background: var(--texto); color: #fff; }
+.btn-contorno { border-color: #d6d6d6; }
+.btn-contorno:hover { border-color: var(--texto); }
+.btn-pequeno { padding: .55rem 1rem; font-size: .85rem; }
+
+
+/* 4. CABEÇALHO (fica colado ao topo ao rolar) ---------- */
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, .85);       /* branco quase opaco */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);                /* desfoca o que passa por trás */
+}
+
+.cabecalho-interno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 4.25rem;
+}
+
+.marca {
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.links {
+  display: none;             /* no telemóvel os links ficam escondidos */
+  gap: 2rem;
+  font-size: .9rem;
+  color: var(--suave);
+}
+.links a { transition: color var(--transicao); }
+.links a:hover { color: var(--texto); }
+@media (min-width: 800px) {
+  .links { display: flex; }  /* em ecrãs maiores aparecem */
+}
+
+.acoes { display: flex; align-items: center; gap: .5rem; }
+
+
+/* 5. HERO ---------------------------------------------- */
+.hero {
+  display: grid;
+  gap: 1.75rem;
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.estado {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .9rem;
+  color: var(--suave);
+}
+
+.bolinha {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--verde);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, .18);   /* halo suave à volta da bolinha */
+}
+
+.frase {
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  line-height: .98;
+  letter-spacing: -0.05em;
+  text-wrap: balance;        /* quebra as linhas de forma equilibrada */
+}
+
+.hero-foto { margin: 0; }
+
+.hero-foto img {
+  width: 100%;
+  height: auto;
+  /* "multiply" = o branco da foto fica igual ao fundo branco, por isso desaparece */
+  mix-blend-mode: multiply;
+  /* A parte de baixo da foto esfuma-se (degradê de opaco para transparente) */
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+          mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+
+.hero-rodape { display: grid; gap: 1.5rem; }
+.titulo-hero { font-size: 1rem; }
+.botoes { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+.bio { max-width: 26rem; font-size: 1rem; }
+
+/* Em ecrãs grandes: títulos à esquerda e foto à direita (como nas referências) */
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-areas:
+      "estado foto"
+      "frase  foto"
+      "rodape foto";
+    column-gap: 3rem;
+    padding-top: 4rem;
+  }
+  .estado      { grid-area: estado; }
+  .frase       { grid-area: frase; align-self: center; }
+  .hero-foto   { grid-area: foto; align-self: center; }
+  .hero-rodape { grid-area: rodape; grid-template-columns: 1fr 1fr; align-items: end; }
+}
+
+
+/* 6. SECÇÕES ------------------------------------------- */
+.seccao {
+  padding-block: 4.5rem;
+  scroll-margin-top: 4rem;   /* ao ir para a secção, para antes do cabeçalho */
+}
+
+
+/* 7. PROJECTOS ----------------------------------------- */
+.grelha-projetos {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2.25rem;
+}
+@media (min-width: 800px) {
+  .grelha-projetos { grid-template-columns: 1fr 1fr; }   /* 2 colunas em ecrãs maiores */
+}
+
+.projeto {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;       /* todos os cartões têm a mesma proporção */
+  overflow: hidden;          /* corta o que sai dos cantos redondos */
+  border-radius: var(--raio-cartao);
+  background: var(--cinza-claro);
+}
+
+.projeto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* enche o cartão sem deformar a imagem */
+  transition: transform 800ms cubic-bezier(.22, 1, .36, 1);
+}
+a.projeto:hover img { transform: scale(1.04); }   /* zoom suave ao passar o rato */
+
+/* Sem imagem: mostramos a primeira letra do título em grande */
+.projeto-vazio {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--fonte-titulo);
+  font-size: 7rem;
+  font-weight: 600;
+  color: #d0d0d0;
+}
+
+/* Etiqueta branca por cima da imagem, no canto inferior esquerdo */
+.legenda {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  max-width: calc(100% - 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: .7rem 1rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
+.legenda strong { font-size: .95rem; font-weight: 600; }
+.legenda span { font-size: .8rem; color: var(--suave); }
+
+
+/* 8. COMPETÊNCIAS -------------------------------------- */
+.lista-skills {
+  list-style: none;
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 2.25rem;
+}
+@media (min-width: 800px) {
+  .lista-skills { grid-template-columns: 1fr 1fr; column-gap: 4rem; }
+}
+
+.skill-topo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+}
+.skill-topo span:last-child { color: var(--suave); }
+
+.barra-skill {
+  margin-top: .65rem;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--linha);
+  overflow: hidden;
+}
+
+.barra-skill-cheia {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--texto);
+  transition: width 1000ms cubic-bezier(.22, 1, .36, 1);   /* a barra enche devagar */
+}
+
+
+/* 9. FORMAÇÃO ------------------------------------------ */
+.lista-formacao {
+  margin-top: 2.25rem;
+  border-top: 1px solid var(--linha);
+}
+
+.formacao {
+  display: grid;
+  gap: .35rem;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--linha);
+}
+@media (min-width: 800px) {
+  .formacao { grid-template-columns: 14rem 1fr; gap: 2rem; }   /* período à esquerda */
+}
+
+.periodo { font-size: .9rem; color: var(--suave); }
+.curso {
+  font-family: var(--fonte-titulo);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.instituicao { font-size: .95rem; color: var(--suave); }
+
+
+/* 10. CONTACTO ----------------------------------------- */
+.contacto { padding-bottom: 5rem; }
+
+.contacto h2 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  letter-spacing: -0.05em;
+  line-height: .98;
+}
+
+.intro { margin-top: 1.25rem; font-size: 1.05rem; }
+
+.email-grande {
+  display: inline-block;
+  margin-top: 2rem;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.25rem, 3.6vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  border-bottom: 2px solid var(--texto);
+  overflow-wrap: anywhere;   /* um email comprido não parte o ecrã */
+}
+
+.redes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 1.75rem;
+  margin-top: 2rem;
+}
+.redes a {
+  padding-bottom: .15rem;
+  border-bottom: 1px solid var(--linha);
+  transition: border-color var(--transicao);
+}
+.redes a:hover { border-color: var(--texto); }
+
+.contacto-detalhes { margin-top: 2rem; font-size: .95rem; }
+
+
+/* 11. RODAPÉ ------------------------------------------- */
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 2rem;
+  border-top: 1px solid var(--linha);
+  font-size: .9rem;
+}
+
+/* Botão com aspeto de link (sublinhado discreto) */
+.link-discreto {
+  font-size: .9rem;
+  color: var(--suave);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color var(--transicao);
+}
+.link-discreto:hover { color: var(--texto); }
+
+
+/* 12. JANELAS (login e gaveta do editor) --------------- */
+/* Camada que cobre o ecrã inteiro. "display: grid" + "place-items: center" centra a caixa de login */
+.janela {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+}
+
+/* O fundo escuro e desfocado por trás da janela */
+.fundo {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, .35);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* Caixa branca do login */
+.caixa {
+  position: relative;        /* fica por cima do fundo escuro */
+  width: min(24rem, calc(100% - 2.5rem));
+  display: grid;
+  gap: .4rem;
+  padding: 1.75rem;
+  border-radius: var(--raio-cartao);
+  background: #fff;
+  animation: subir 300ms ease;
+}
+.caixa h2 { font-size: 1.75rem; }
+.caixa > .suave { margin-bottom: .5rem; font-size: .95rem; }
+
+.campo-rotulo { margin-top: .5rem; font-size: .85rem; color: var(--suave); }
+
+/* Caixas de escrever (usadas no login e no editor) */
+input, textarea {
+  width: 100%;
+  padding: .75rem .9rem;
+  border: 1px solid #dadada;
+  border-radius: .8rem;
+  background: #fff;
+  font-size: 16px;           /* 16 px ou mais: o iPhone não dá zoom ao escrever */
+  outline: none;
+  transition: border-color var(--transicao);
+}
+input:focus, textarea:focus { border-color: var(--texto); }
+/* Nos campos de escrever, o destaque é só a borda (sem o contorno extra do teclado) */
+input:focus-visible, textarea:focus-visible { outline: none; }
+
+.erro { margin-top: .5rem; font-size: .9rem; color: #dc2626; }
+
+.botoes-direita {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+/* Gaveta do editor: ocupa a altura toda e entra pela direita */
+.gaveta {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(30rem, 100%);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  animation: entrar-gaveta 420ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.gaveta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--linha);
+}
+.gaveta-topo h2 { font-size: 1.2rem; }
+
+.btn-fechar {
+  padding: .1rem .5rem;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--suave);
+}
+.btn-fechar:hover { color: var(--texto); }
+
+/* Só o corpo da gaveta rola; o cabeçalho e o rodapé ficam fixos */
+.gaveta-corpo {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.estado-guardar { margin-bottom: .5rem; font-size: .85rem; color: var(--suave); }
+
+.gaveta-rodape {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linha);
+}
+
+/* Blocos do editor (Foto, Início, Contacto, Competências...) */
+#editor { display: grid; }
+
+.bloco {
+  display: grid;
+  gap: .6rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--linha);
+}
+.bloco:first-child { padding-top: 0; border-top: 0; }
+.bloco h3 { font-size: 1rem; font-weight: 600; }
+
+.bloco-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+/* Cada projecto, formação ou competência é um "item" com contorno */
+.item {
+  display: grid;
+  gap: .5rem;
+  padding: .85rem;
+  border: 1px solid var(--linha);
+  border-radius: 1rem;
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.linha input { flex: 1; min-width: 0; }
+.linha .nivel { flex: 0 0 5.5rem; }   /* a caixa da percentagem tem tamanho fixo */
+
+.btn-remover {
+  flex-shrink: 0;
+  font-size: .85rem;
+  color: var(--suave);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-remover:hover { color: #dc2626; }
+
+/* Miniatura e botões de imagem */
+.imagem-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem;
+}
+.miniatura {
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: .7rem;
+  background: var(--cinza-claro);
+}
+.miniatura.redonda { border-radius: 50%; }
+.miniatura img { width: 100%; height: 100%; object-fit: cover; }
+
+.imagem-botoes {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .75rem;
+}
+
+/* O <input type="file"> fica quase invisível, porque o botão bonito é outro */
+.ficheiro-escondido {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mensagem curta no fundo do ecrã */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  z-index: 60;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 2.5rem);
+  padding: .75rem 1.1rem;
+  border-radius: var(--raio-pilula);
+  background: var(--texto);
+  color: #fff;
+  font-size: .9rem;
+  text-align: center;
+}
+
+
+/* 13. ANIMAÇÕES E ACESSIBILIDADE ----------------------- */
+/* Enquanto os dados não chegam, a página fica invisível (o JavaScript tira esta classe) */
+main { transition: opacity 600ms ease; }
+.a-carregar main { opacity: 0; }
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes entrar-gaveta {
+  from { transform: translateX(100%); }
+}
+
+/* Quem pediu menos movimento no telemóvel não vê animações */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html { scroll-behavior: auto; }
+}
