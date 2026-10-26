@@ -6,7 +6,7 @@
 
 // 1) URL do teu projeto Supabase (Project Settings → API)
 //    Exemplo: "https://abcdxyz123.supabase.co"
-const SUPABASE_URL = "//https://ntkkdmplcqnygxlmxflo.supabase.co";
+const SUPABASE_URL = "//https://   ntkkdmplcqnygxlmxflo.supabase.com";
 
 // 2) Chave PÚBLICA (publishable, ou anon nos projetos antigos).
 //    Pode estar no site, porque é pública por desenho: quem a vê só consegue
@@ -16,4 +16,5 @@ const SUPABASE_CHAVE = "sb_publishable_ORWaGZnDR98UJBTUYYfRow_fCiI7X3m";
 
 // 3) O teu email de login. Tem de ser IGUAL ao que escreveste no supabase.sql
 //    e todo em minúsculas.
-const EMAIL_DO_DONO = "josedaluz024@gmail.com";
+const EMAIL_DO_DONO = 
+"PRETTOLEO6@GMAIL.COM";
