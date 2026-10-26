@@ -16,6 +16,17 @@
 // "use strict" faz o JavaScript avisar-te de erros que de outra forma passavam em silêncio
 "use strict";
 
+/* ---------- 0. PROTEÇÃO CONTRA PÁGINA EM BRANCO ----------
+   Se algo correr mal (por exemplo, um erro no config.js), a página NÃO pode ficar invisível.
+   Qualquer erro não tratado aparece escrito no ecrã e a página mostra-se na mesma.
+   No telemóvel não há consola, por isso é assim que vês o problema. */
+window.addEventListener("error", (evento) => {
+  mostrarErroNoEcra("Erro: " + (evento.message || "motivo desconhecido"));
+});
+window.addEventListener("unhandledrejection", (evento) => {
+  mostrarErroNoEcra("Erro: " + textoDoErro(evento.reason));
+});
+
 // Escondemos a página até os dados chegarem (senão via-se o exemplo por instantes)
 document.documentElement.classList.add("a-carregar");
 
@@ -55,15 +66,29 @@ const emailSeguro = (valor) => {
 // Mantém um número entre 0 e 100
 const limitar = (n) => Math.min(100, Math.max(0, Number(n) || 0));
 
-// Mensagem curta no fundo do ecrã (desaparece sozinha ao fim de 4,5 segundos)
+// Mensagem curta no fundo do ecrã.
+// "duracao" em milissegundos: 0 = fica no ecrã até lhe tocares.
 let temporizadorAviso = null;
-function mostrarAviso(texto) {
+function mostrarAviso(texto, duracao = 4500) {
   const aviso = $("#aviso");
   aviso.textContent = texto;
   aviso.hidden = false;
   clearTimeout(temporizadorAviso);
-  temporizadorAviso = setTimeout(() => (aviso.hidden = true), 4500);
+  if (duracao > 0) temporizadorAviso = setTimeout(() => (aviso.hidden = true), duracao);
 }
+
+// Mostra um erro no ecrã sem depender do resto do script (funciona mesmo que algo tenha falhado).
+function mostrarErroNoEcra(texto) {
+  const aviso = document.getElementById("aviso");
+  if (aviso) {
+    aviso.textContent = texto;
+    aviso.hidden = false;   // fica visível até lhe tocares
+  }
+  document.documentElement.classList.remove("a-carregar"); // a página mostra-se mesmo assim
+}
+
+// Qualquer erro (texto, objeto ou erro do Supabase) passa a ser uma frase legível
+const textoDoErro = (erro) => (erro && erro.message ? erro.message : String(erro));
 
 
 /* ---------- 2. DADOS DE EXEMPLO ----------
@@ -107,15 +132,40 @@ function dadosDeExemplo() {
 // A tabela "portfolio" tem só UMA linha, com id = 1 (ver o supabase.sql)
 const ID_DO_PORTFOLIO = 1;
 
-// "configurado" é true quando já preencheste o config.js (sem as palavras COLA-AQUI)
-const configurado = ![SUPABASE_URL, SUPABASE_CHAVE, EMAIL_DO_DONO].some((valor) => valor.includes("COLA-AQUI"));
+// Lê as variáveis do config.js com cuidado. "typeof" não dá erro, mesmo que o config.js
+// esteja estragado e a variável nem exista. Assim, em vez de a página parar, damos uma mensagem.
+const configSupabase = {
+  url: typeof SUPABASE_URL === "string" ? SUPABASE_URL.trim() : "",
+  chave: typeof SUPABASE_CHAVE === "string" ? SUPABASE_CHAVE.trim() : "",
+  email: typeof EMAIL_DO_DONO === "string" ? EMAIL_DO_DONO.trim().toLowerCase() : "",
+};
 
-// A biblioteca do Supabase cria "window.supabase". Guardamos a ligação numa variável
-// com outro nome ("clienteSupabase") para não confundir com a biblioteca.
-let clienteSupabase = null;
-if (configurado && window.supabase) {
-  clienteSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_CHAVE); // liga ao teu projeto
+// Um valor está preenchido se não estiver vazio e não for o texto de modelo "COLA-AQUI"
+const preenchido = (valor) => valor !== "" && !valor.includes("COLA-AQUI");
+
+// O URL do projeto tem de ser só "https://xxxx.supabase.co".
+// Está errado se tiver "/rest/v1/", barras a mais, espaços ou outro domínio.
+function urlDoProjetoValido(url) {
+  try {
+    const u = new URL(url);                       // o browser tenta perceber o endereço
+    return u.protocol === "https:" && (u.pathname === "/" || u.pathname === "") && !u.search && !u.hash;
+  } catch (erro) {
+    return false;                                 // endereço impossível de ler, ex.: "//https://..."
+  }
 }
+
+// Qual é o problema da configuração? Texto vazio = está tudo bem.
+let problemaDeConfiguracao = "";
+if (!preenchido(configSupabase.url) || !preenchido(configSupabase.chave) || !preenchido(configSupabase.email)) {
+  problemaDeConfiguracao = "Falta preencher o config.js (ver o guia, passo 6).";
+} else if (!urlDoProjetoValido(configSupabase.url)) {
+  problemaDeConfiguracao = "O SUPABASE_URL do config.js está errado. Tem de ser só https://xxxx.supabase.co (sem /rest/v1/ e sem barras a mais).";
+}
+
+// A ligação ao Supabase. Começa vazia e só é criada no "iniciar()", dentro de um try/catch.
+let clienteSupabase = null;
+// Guarda o motivo de não haver ligação, para o mostrar quando tocas em "Área do autor"
+let motivoSemLigacao = "";
 
 
 /* ---------- 4. CARREGAR E GUARDAR ---------- */
@@ -276,7 +326,7 @@ function desenhar(animar = false) {
 /* ---------- 6. LOGIN E SESSÃO ---------- */
 
 // Compara o email da sessão com o TEU email (sem diferenciar maiúsculas)
-const emailEhDono = (email) => String(email ?? "").toLowerCase() === EMAIL_DO_DONO.toLowerCase();
+const emailEhDono = (email) => String(email ?? "").toLowerCase() === configSupabase.email;
 
 // O Supabase avisa-nos sempre que alguém entra, sai ou a sessão é renovada.
 // Também avisa logo ao abrir a página, para sabermos se já estás com sessão iniciada neste dispositivo.
@@ -288,7 +338,7 @@ function ligarSessao() {
 }
 
 function abrirLogin() {
-  if (!clienteSupabase) return mostrarAviso("Falta preencher o config.js (ver o guia, passo 6).");
+  if (!clienteSupabase) return mostrarAviso(motivoSemLigacao || "Sem ligação ao Supabase.", 0);
   $("#erro-login").hidden = true;
   $("#janela-login").hidden = false;
   $("#campo-email").focus();
@@ -315,7 +365,8 @@ async function entrar(evento) {
   $("#campo-palavra").value = "";            // por segurança, apagamos a palavra-passe do campo
 
   if (error) {
-    erro.textContent = "Não entrou. Verifica o email, a palavra-passe e a ligação.";
+    // Mostramos a mensagem do Supabase (em inglês) para perceberes o motivo, ex.: "Invalid login credentials"
+    erro.textContent = "Não entrou: " + error.message;
     erro.hidden = false;
     return;
   }
@@ -609,6 +660,9 @@ function repor() {
 
 // Liga todos os botões e campos aos seus "ouvintes" (funções que correm ao clicar, escrever, etc.)
 function ligarBotoes() {
+  // Tocar na mensagem do fundo do ecrã fecha-a
+  $("#aviso").addEventListener("click", () => ($("#aviso").hidden = true));
+
   // Login e editor
   $("#form-login").addEventListener("submit", entrar);
   $("#btn-autor").addEventListener("click", () => (ehDono ? abrirEditor() : abrirLogin()));
@@ -633,27 +687,31 @@ function ligarBotoes() {
 async function iniciar() {
   ligarBotoes();
 
-  if (!window.supabase) {
-    // A biblioteca do Supabase não chegou (normalmente é falta de internet)
-    mostrarAviso("Não consegui carregar a biblioteca do Supabase. Verifica a ligação à internet.");
-  } else if (!configurado) {
-    // Ainda não preencheste o config.js
-    mostrarAviso("Falta preencher o config.js (ver o guia, passo 6).");
-  } else {
-    ligarSessao();                           // começa a "ouvir" o login
-    try {
-      // Espera no máximo 6 segundos pelos dados. Se não chegarem, mostramos o exemplo.
-      await Promise.race([
-        carregarDoSupabase(),
-        new Promise((_, rejeitar) => setTimeout(() => rejeitar(new Error("tempo esgotado")), 6000)),
-      ]);
-    } catch (erro) {
-      console.error(erro);
-      mostrarAviso("Não consegui carregar os dados: " + erro.message);
+  try {
+    // 1) A biblioteca do Supabase tem de ter chegado (senão falta internet)
+    if (!window.supabase) {
+      throw new Error("Não consegui carregar a biblioteca do Supabase. Verifica a ligação à internet.");
     }
+    // 2) O config.js tem de estar bem preenchido
+    if (problemaDeConfiguracao) {
+      throw new Error(problemaDeConfiguracao);
+    }
+    // 3) Criamos a ligação ao teu projeto (se o endereço estiver mal, o Supabase falha aqui)
+    clienteSupabase = window.supabase.createClient(configSupabase.url, configSupabase.chave);
+    ligarSessao();                           // começa a "ouvir" o login
+    // 4) Vamos buscar os dados. Espera no máximo 6 segundos; se não chegarem, mostra o exemplo.
+    await Promise.race([
+      carregarDoSupabase(),
+      new Promise((_, rejeitar) => setTimeout(() => rejeitar(new Error("a ligação demorou demasiado")), 6000)),
+    ]);
+  } catch (erro) {
+    // Qualquer problema cai aqui: a mensagem fica no ecrã e a página aparece na mesma (com o exemplo)
+    console.error(erro);
+    motivoSemLigacao = textoDoErro(erro);
+    mostrarAviso("Erro: " + textoDoErro(erro), 0);   // 0 = fica no ecrã até lhe tocares
   }
 
-  desenhar(true);                                              // desenha a página com os dados
+  desenhar(true);                                              // desenha a página
   document.documentElement.classList.remove("a-carregar");     // e mostra-a
 }
 
